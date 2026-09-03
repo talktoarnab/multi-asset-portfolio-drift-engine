@@ -17,6 +17,12 @@ variable "jwt_secret" {
   default     = "super-secret-drift-engine-key-2026-prod"
 }
 
+variable "enable_cloudfront" {
+  type        = bool
+  description = "Set true once the AWS account is verified for CloudFront. While false the frontend bucket has no CDN and no bucket policy, so only the API is reachable."
+  default     = false
+}
+
 variable "sender_email" {
   type        = string
   description = "The verified SES email address to send drift alerts from"

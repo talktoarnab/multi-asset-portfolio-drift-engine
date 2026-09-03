@@ -1,6 +1,8 @@
+// Empty rather than null while CloudFront is disabled, so `output -raw` keeps
+// working in the deploy workflow.
 output "frontend_url" {
-  value       = "https://${aws_cloudfront_distribution.frontend.domain_name}"
-  description = "The URL of the CloudFront distribution serving the React frontend"
+  value       = var.enable_cloudfront ? "https://${aws_cloudfront_distribution.frontend[0].domain_name}" : ""
+  description = "The URL of the CloudFront distribution serving the React frontend, empty when CloudFront is disabled"
 }
 
 output "api_url" {
@@ -19,7 +21,7 @@ output "s3_bucket_name" {
 }
 
 output "cloudfront_distribution_id" {
-  value       = aws_cloudfront_distribution.frontend.id
-  description = "The ID of the CloudFront distribution"
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.frontend[0].id : ""
+  description = "The ID of the CloudFront distribution, empty when CloudFront is disabled"
 }
 

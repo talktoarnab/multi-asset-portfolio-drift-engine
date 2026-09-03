@@ -31,6 +31,8 @@ resource "aws_cloudfront_origin_access_control" "frontend" {
 
 # CloudFront Distribution
 resource "aws_cloudfront_distribution" "frontend" {
+  count = var.enable_cloudfront ? 1 : 0
+
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
@@ -92,6 +94,8 @@ resource "aws_cloudfront_distribution" "frontend" {
 
 # S3 Bucket Policy to Allow CloudFront OAC Access
 resource "aws_s3_bucket_policy" "frontend" {
+  count = var.enable_cloudfront ? 1 : 0
+
   bucket = aws_s3_bucket.frontend.id
 
   policy = jsonencode({
@@ -107,7 +111,7 @@ resource "aws_s3_bucket_policy" "frontend" {
         Resource = "${aws_s3_bucket.frontend.arn}/*"
         Condition = {
           StringEquals = {
-            "AWS:SourceArn" = aws_cloudfront_distribution.frontend.arn
+            "AWS:SourceArn" = aws_cloudfront_distribution.frontend[0].arn
           }
         }
       }

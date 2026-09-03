@@ -38,8 +38,10 @@ jobs:
           # Capture outputs for frontend build
           API_URL=$(terraform -chdir=terraform output -raw api_url)
           S3_BUCKET=$(terraform -chdir=terraform output -raw s3_bucket_name)
+          DIST_ID=$(terraform -chdir=terraform output -raw cloudfront_distribution_id)
           echo "API_URL=$API_URL" >> $GITHUB_ENV
           echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+          echo "DIST_ID=$DIST_ID" >> $GITHUB_ENV
 
       - name: Install Frontend Dependencies & Build
         run: |
@@ -53,6 +55,6 @@ jobs:
           aws s3 sync frontend/dist/ s3://${{ env.S3_BUCKET }} --delete
 
       - name: Invalidate CloudFront Cache
+        if: env.DIST_ID != ''
         run: |
-          DIST_ID=$(terraform -chdir=terraform output -raw cloudfront_distribution_id)
-          aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ env.DIST_ID }} --paths "/*"
