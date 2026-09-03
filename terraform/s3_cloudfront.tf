@@ -54,10 +54,10 @@ resource "aws_cloudfront_distribution" "frontend" {
       }
     }
 
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
-    compress               = true
+    min_ttl     = 0
+    default_ttl = 3600
+    max_ttl     = 86400
+    compress    = true
   }
 
   # SPA Routing: Redirect 403/404 to index.html with 200 OK
@@ -98,8 +98,8 @@ resource "aws_s3_bucket_policy" "frontend" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "AllowCloudFrontServicePrincipalReadOnly"
-        Effect    = "Allow"
+        Sid    = "AllowCloudFrontServicePrincipalReadOnly"
+        Effect = "Allow"
         Principal = {
           Service = "cloudfront.amazonaws.com"
         }
