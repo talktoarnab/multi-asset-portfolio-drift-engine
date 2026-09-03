@@ -1,9 +1,10 @@
-# Archive the backend code
+# Archive the deployment package assembled by scripts/build-lambda.sh. Run that
+# script before plan or apply; it bundles third-party dependencies, which a zip
+# of the source tree alone would omit.
 data "archive_file" "backend_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/../backend"
+  source_dir  = "${path.module}/../build/lambda"
   output_path = "${path.module}/backend.zip"
-  excludes    = ["venv", "__pycache__", "common/__pycache__", "api/__pycache__", "cron/__pycache__"]
 }
 
 # IAM Role for Lambda Execution
@@ -90,7 +91,7 @@ resource "aws_lambda_function" "auth_handler" {
   source_code_hash = data.archive_file.backend_zip.output_base64sha256
   function_name    = "portfolio-drift-engine-auth-${var.environment}"
   role             = aws_iam_role.lambda_exec.arn
-  handler          = "api.auth_handler.handler"
+  handler          = "backend.api.auth_handler.handler"
   runtime          = "python3.10"
   timeout          = 15
   memory_size      = 256
@@ -106,7 +107,7 @@ resource "aws_lambda_function" "portfolio_handler" {
   source_code_hash = data.archive_file.backend_zip.output_base64sha256
   function_name    = "portfolio-drift-engine-portfolio-${var.environment}"
   role             = aws_iam_role.lambda_exec.arn
-  handler          = "api.portfolio_handler.handler"
+  handler          = "backend.api.portfolio_handler.handler"
   runtime          = "python3.10"
   timeout          = 15
   memory_size      = 256
@@ -122,7 +123,7 @@ resource "aws_lambda_function" "rebalance_handler" {
   source_code_hash = data.archive_file.backend_zip.output_base64sha256
   function_name    = "portfolio-drift-engine-rebalance-${var.environment}"
   role             = aws_iam_role.lambda_exec.arn
-  handler          = "api.rebalance_handler.handler"
+  handler          = "backend.api.rebalance_handler.handler"
   runtime          = "python3.10"
   timeout          = 15
   memory_size      = 256
@@ -138,7 +139,7 @@ resource "aws_lambda_function" "daily_evaluator" {
   source_code_hash = data.archive_file.backend_zip.output_base64sha256
   function_name    = "portfolio-drift-engine-evaluator-${var.environment}"
   role             = aws_iam_role.lambda_exec.arn
-  handler          = "cron.daily_evaluator.lambda_handler"
+  handler          = "backend.cron.daily_evaluator.lambda_handler"
   runtime          = "python3.10"
   timeout          = 60
   memory_size      = 256

@@ -175,7 +175,16 @@ MOCK_DB=true python cron/daily_evaluator.py
 
 ## 🚀 Deployment to AWS
 
-### 1. Provision Infrastructure using Terraform
+### 1. Build the Lambda Deployment Package
+Terraform archives `build/lambda`, which bundles the backend source alongside its
+third-party dependencies. Build it before any plan or apply, otherwise Terraform
+has nothing to archive:
+
+```bash
+./scripts/build-lambda.sh
+```
+
+### 2. Provision Infrastructure using Terraform
 Ensure you have configured your AWS CLI credentials, then run:
 
 ```bash
@@ -187,7 +196,7 @@ terraform apply
 
 This will provision all serverless AWS resources and output the `frontend_url` and `api_url`.
 
-### 2. Deploy the Frontend
+### 3. Deploy the Frontend
 Build and sync the frontend static assets to S3, injecting the deployed API Gateway URL:
 
 ```bash
